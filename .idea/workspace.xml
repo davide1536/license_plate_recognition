@@ -4,25 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d7c3f4e7-a6d3-4737-854e-88f397495ffb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/license_plate_recognition.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Images/veichle1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Images/veichle2.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Images/veichle3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Images/veichle4.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Images/veichle5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Utilities.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/license_plate_detection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project_resources/plate detection paper.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yolov3_plate_detection.weights" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yolov3_veic_detection.weights" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yolov3config_plate_detection.cfg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/yolov3config_veic_detection.cfg" afterDir="false" />
+    <list default="true" id="d7c3f4e7-a6d3-4737-854e-88f397495ffb" name="Changes" comment="Neural network weights loading">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utilities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/license_plate_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/license_plate_detection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,6 +57,19 @@
       <option name="presentableId" value="Default" />
       <updated>1737814594717</updated>
     </task>
+    <task id="LOCAL-00001" summary="Neural network weights loading">
+      <option name="closed" value="true" />
+      <created>1737816332399</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1737816332399</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Neural network weights loading" />
+    <option name="LAST_COMMIT_MESSAGE" value="Neural network weights loading" />
   </component>
 </project>
