@@ -10,7 +10,7 @@ def load_images_from_folder(folder):
     return images
 
 
-def find_bounding_boxes(frame, outs, objectnessThreshold=0.5, confThreshold = 0.5, nmsThreshold = 0.3, debug = True):
+def findObjectsInFrame(frame, outs, objectnessThreshold=0.5, confThreshold = 0.5, nmsThreshold = 0.3, debug = True):
     """Remove the bounding boxes with low confidence using non-maxima suppression."""
     frameHeight = frame.shape[0]
     frameWidth = frame.shape[1]
@@ -68,3 +68,13 @@ def getOutputsNames(net):
     layersNames = net.getLayerNames()
     # Get the names of the output layers, i.e. the layers with unconnected outputs
     return [layersNames[i - 1] for i in net.getUnconnectedOutLayers()]
+
+def getBoundingBoxes(network, image, width, height):
+    # set neural network input
+    blob = cv2.dnn.blobFromImage(image, 1 / 255, (width, height), [0, 0, 0], 1, crop=False)
+    network.setInput(blob)
+    # retrieve neural network outputs and find bounding boxes
+    outs = network.forward(getOutputsNames(network))
+    box_image = image.copy()
+    boxes, classIds, confidences = findObjectsInFrame(box_image, outs)
+    return box_image, boxes, classIds, confidences
