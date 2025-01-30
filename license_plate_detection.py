@@ -4,23 +4,41 @@ import glob
 import matplotlib.pyplot as plt
 import pytesseract
 import Utilities
-from Utilities import load_images_from_folder, getOutputsNames, getBoundingBoxes
+from Utilities import load_images_from_folder, getBoundingBoxes, clear_image, transform_image
 
-debug = True
+
+
+def clean_and_transform_plates(license_plates):
+    debug = True
+    for license_plate in license_plates:
+        #retrieve license plate image
+        license_plate_image = license_plate[0]
+        license_plate_image =  clear_image(license_plate_image, 5, 100, 100, 240)
+        if debug:
+            cv2.namedWindow("cleared license plate", cv2.WINDOW_NORMAL)
+            cv2.imshow("cleared license plate", license_plate_image)
+            cv2.waitKey(0)
+        license_plate_image = transform_image(license_plate_image)
+        if debug:
+            cv2.namedWindow("final license plate", cv2.WINDOW_NORMAL)
+            cv2.imshow("final license plate", license_plate_image)
+            cv2.waitKey(0)
+
+
+
 
 #retrieve the roi (region of interest) of a given image
-def get_roi(network, image, width, height):
+def get_roi(network, image, width, height, offsetx, offsety):
 
     box_image,boxes, classIds, confidences = getBoundingBoxes(network, image, width, height)
-
 
     roi_images = []
     for box in boxes:
         left,top,car_width,car_height = box
-        roi_image = image[top:top+car_height, left:left+car_width]
+        roi_image = image[top:top+car_height+offsety, left:left+car_width+offsetx]
         roi_images.append(roi_image)
 
-    return roi_images
+    return roi_images, classIds, confidences
 
 '''
 Funtions that returns the set of license plates found in a set of images. The function is composed of 2 steps:
@@ -28,7 +46,8 @@ Funtions that returns the set of license plates found in a set of images. The fu
 2) Given the cars found in the first step, the function detects the respective license plates
 
 '''
-def detect_license_plates(images, vehicle_detection, plate_detection):
+def detect_license_plates(images, vehicle_detection, plate_detection, license_plate_resolution_threshold=80):
+    debug = False
     NN_width = 416
     NN_height = 416
     total_license_plates = []
@@ -38,20 +57,24 @@ def detect_license_plates(images, vehicle_detection, plate_detection):
             cv2.imshow("image", image)
             cv2.waitKey(0)
         #Car detection
-        detected_cars = get_roi(vehicle_detection, image, NN_width, NN_height)
-
-        for detected_car in detected_cars:
+        cars_info = get_roi(vehicle_detection, image, NN_width, NN_height, 0, 0)
+        print(cars_info[2])
+        for i,detected_car in enumerate(cars_info[0]):
+            vehicle_id = cars_info[1]
             if debug:
                 cv2.namedWindow("bounding box car", cv2.WINDOW_NORMAL)
                 cv2.imshow("bounding box car", detected_car)
                 cv2.waitKey(0)
-            car_license_plates = get_roi(plate_detection, detected_car, NN_width, NN_height)
+            license_plates_info = get_roi(plate_detection, detected_car, NN_width, NN_height, 3, 3)
             if debug:
-                for car_license_plate in car_license_plates:
+                for car_license_plate in license_plates_info[0]:
                     cv2.namedWindow("license_plate", cv2.WINDOW_NORMAL)
                     cv2.imshow("license_plate", car_license_plate)
                     cv2.waitKey(0)
-            total_license_plates.append(car_license_plates)
+            license_plates_images = license_plates_info[0]
+            for license_plate_image in license_plates_images:
+                if license_plate_image.shape[1] >= license_plate_resolution_threshold:
+                    total_license_plates.append([license_plate_image, vehicle_id])
 
     return total_license_plates
 
@@ -62,21 +85,30 @@ def detect_license_plates(images, vehicle_detection, plate_detection):
 
 
 
+if __name__ == "__main__":
+    #load input images
+    input_images = load_images_from_folder("Images/")
 
-#load input images
-input_images = load_images_from_folder("Images/")
+    #load neural network weights - Car Detection
+    config_file_veic_detection = 'yolov3config_veic_detection.cfg'
+    model_file_veic_detection = 'yolov3_veic_detection.weights'
+    veic_detection_net = cv2.dnn.readNetFromDarknet(config_file_veic_detection, model_file_veic_detection)
 
-#load neural network weights - Car Detection
-config_file_veic_detection = 'yolov3config_veic_detection.cfg'
-model_file_veic_detection = 'yolov3_veic_detection.weights'
-veic_detection_net = cv2.dnn.readNetFromDarknet(config_file_veic_detection, model_file_veic_detection)
+    #load neural network weights - License Plate Detection
+    config_file_plate_detection = 'yolov3config_plate_detection.cfg'
+    model_file_plate_detection = 'yolov3_plate_detection.weights'
+    license_plate_detection_net = cv2.dnn.readNetFromDarknet(config_file_plate_detection, model_file_plate_detection)
 
-#load neural network weights - License Plate Detection
-config_file_plate_detection = 'yolov3config_plate_detection.cfg'
-model_file_plate_detection = 'yolov3_plate_detection.weights'
-license_plate_detection_net = cv2.dnn.readNetFromDarknet(config_file_plate_detection, model_file_plate_detection)
+    #retrieves the set of license plates in a given image
+    license_plates_raw = detect_license_plates(input_images, veic_detection_net, license_plate_detection_net)
+    license_plates_cleaned = clean_and_transform_plates(license_plates_raw)
 
-detect_license_plates(input_images, veic_detection_net, license_plate_detection_net)
+
+
+
+
+
+
 
 
 
