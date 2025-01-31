@@ -6,10 +6,29 @@ import pytesseract
 import Utilities
 from Utilities import load_images_from_folder, getBoundingBoxes, clear_image, transform_image
 
+def extract_text_from_license_plate(license_plates):
+    for license_plate in license_plates:
+        grey_plate = cv2.cvtColor(license_plate[0], cv2.COLOR_BGR2GRAY)
+        binary_plate_warped = cv2.threshold(grey_plate, 0, 255,
+                                            cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        squareKern = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        binary_plate_warped_cleaned = cv2.morphologyEx(binary_plate_warped, cv2.MORPH_CLOSE, squareKern)
+        squareKern = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+        binary_plate_warped_cleaned = cv2.morphologyEx(binary_plate_warped_cleaned, cv2.MORPH_OPEN, squareKern)
 
+        #define tesseract parameters
+        psm = 7
+        alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        options = "-c tessedit_char_whitelist={}".format(alphanumeric)
+        # set the PSM mode
+        options += " --psm {}".format(psm)
+        #return text
+        text = pytesseract.image_to_string(binary_plate_warped_cleaned, config=options)
+        license_plate.append(text)
+    return license_plates
 
 def clean_and_transform_plates(license_plates):
-    debug = True
+    debug = False
     for license_plate in license_plates:
         #retrieve license plate image
         license_plate_image = license_plate[0]
@@ -23,6 +42,10 @@ def clean_and_transform_plates(license_plates):
             cv2.namedWindow("final license plate", cv2.WINDOW_NORMAL)
             cv2.imshow("final license plate", license_plate_image)
             cv2.waitKey(0)
+        license_plate[0] = license_plate_image
+
+    return license_plates
+
 
 
 
@@ -102,6 +125,15 @@ if __name__ == "__main__":
     #retrieves the set of license plates in a given image
     license_plates_raw = detect_license_plates(input_images, veic_detection_net, license_plate_detection_net)
     license_plates_cleaned = clean_and_transform_plates(license_plates_raw)
+    license_plate_with_text = extract_text_from_license_plate(license_plates_cleaned)
+
+    for licese_plate in license_plate_with_text:
+        print(licese_plate[2])
+
+
+
+
+
 
 
 
